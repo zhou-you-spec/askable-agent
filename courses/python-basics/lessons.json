@@ -3,13 +3,24 @@
     "id": "les-course",
     "title": "《Python 数据分析与建模》课程标准",
     "content": "面向高职商务数据分析专业一年级。核心能力：用 pandas 完成数据读取、清洗、分组聚合与可视化，能读懂并定位报错。实训课按「任务卡」推进，教师 1 人带 30-40 人。",
-    "keywords": ["课程", "标准", "教学目标", "实训"]
+    "keywords": [
+      "课程",
+      "标准",
+      "教学目标",
+      "实训"
+    ]
   },
   {
     "id": "les-read",
     "title": "本次课任务卡：把成绩表读进来",
     "content": "任务：读取 成绩.csv，计算平均分，按班级分组。知识点：文件路径、read_csv、mean、groupby。",
-    "keywords": ["读取", "读取csv", "任务卡", "成绩", "平均分"],
+    "keywords": [
+      "读取",
+      "读取csv",
+      "任务卡",
+      "成绩",
+      "平均分"
+    ],
     "sample": "import pandas as pd\n\ndf = pd.read_csv('成绩.csv')\nprint(df['成绩'].mean())",
     "sampleNote": "若文件不在当前工作目录，需写完整路径：r'C:/Users/你/Desktop/成绩.csv'"
   },
@@ -17,25 +28,57 @@
     "id": "les-clean",
     "title": "常见数据清洗动作",
     "content": "缺失值 dropna / fillna；类型转换 to_numeric；去空格 str.strip；重命名列 rename。先看 df.info() 再动手。",
-    "keywords": ["清洗", "缺失值", "去重", "info", "转换"]
+    "keywords": [
+      "清洗",
+      "缺失值",
+      "去重",
+      "info",
+      "转换"
+    ]
   },
   {
     "id": "les-analysis",
     "title": "分组聚合标准写法",
     "content": "df.groupby('班级')['成绩'].mean().reset_index() —— 分组、聚合、把索引还原成列。",
-    "keywords": ["分组", "聚合", "班级", "平均"],
+    "keywords": [
+      "分组",
+      "聚合",
+      "班级",
+      "平均"
+    ],
     "sample": "result = df.groupby('班级')['成绩'].mean().reset_index()\nprint(result)"
   },
   {
     "id": "les-error",
     "title": "读报错的标准动作",
     "content": "从最后一行往上读：先看错误类型和位置，再看调用链。定位到行号后，只改那一行，跑一次，确认报错是否变化。",
-    "keywords": ["报错", "traceback", "定位", "调试"]
+    "keywords": [
+      "报错",
+      "traceback",
+      "定位",
+      "调试"
+    ]
   },
   {
     "id": "les-viz",
     "title": "可视化基本要求",
     "content": "柱状图比大小、折线图看趋势、饼图看占比（类别不超过 5 个）。坐标轴要有名字和单位，标题说结论不说图表类型。",
-    "keywords": ["可视化", "图表", "柱状图", "折线图"]
+    "keywords": [
+      "可视化",
+      "图表",
+      "柱状图",
+      "折线图"
+    ]
+  },
+  {
+    "id": "les-export",
+    "title": "结果导出与保存",
+    "content": "df.to_csv(\"结果.csv\", index=False, encoding=\"utf-8-sig\")；要和别人交接优先存 CSV，别存成乱了格式的 xlsx。",
+    "keywords": [
+      "导出",
+      "保存",
+      "to_csv",
+      "结果"
+    ]
   }
 ]

@@ -2,13 +2,28 @@
   {
     "id": "err-filenotfound",
     "type": "FileNotFoundError",
-    "patterns": ["FileNotFoundError", "does not exist", "No such file or directory", "找不到文件", "没有那个文件"],
+    "patterns": [
+      "FileNotFoundError",
+      "does not exist",
+      "No such file or directory",
+      "找不到文件",
+      "没有那个文件"
+    ],
     "raw": "FileNotFoundError: File b'成绩.csv' does not exist",
     "plain": "电脑没找到「成绩.csv」这个文件——不是你的代码逻辑错了，是它按你写的路径去找，那个位置没有这个文件。",
     "causes": [
-      { "text": "文件名或后缀写错了", "check": "看括号里的名字，和磁盘上的文件是不是一个字都不差（含 .csv 后缀）" },
-      { "text": "文件不在「代码运行时所在的文件夹」", "check": "在代码第一行加 import os; print(os.getcwd())，看它到底在哪个目录跑" },
-      { "text": "文件在别的目录（桌面、下载、U盘）", "check": "右键文件 → 属性 → 复制完整路径，再贴进代码" }
+      {
+        "text": "文件名或后缀写错了",
+        "check": "看括号里的名字，和磁盘上的文件是不是一个字都不差（含 .csv 后缀）"
+      },
+      {
+        "text": "文件不在「代码运行时所在的文件夹」",
+        "check": "在代码第一行加 import os; print(os.getcwd())，看它到底在哪个目录跑"
+      },
+      {
+        "text": "文件在别的目录（桌面、下载、U盘）",
+        "check": "右键文件 → 属性 → 复制完整路径，再贴进代码"
+      }
     ],
     "firstStep": "先别改逻辑。先把文件拖到和 .py 同一个文件夹，或者把括号里换成完整路径（如 r'C:/Users/你/Desktop/成绩.csv'），只改这一处再跑。",
     "concept": "路径与工作目录",
@@ -17,13 +32,27 @@
   {
     "id": "err-indentation",
     "type": "IndentationError",
-    "patterns": ["IndentationError", "unexpected indent", "expected an indented block", "缩进"],
+    "patterns": [
+      "IndentationError",
+      "unexpected indent",
+      "expected an indented block",
+      "缩进"
+    ],
     "raw": "IndentationError: expected an indented block",
     "plain": "Python 在说：这一行该缩进的地方，没有缩进。Python 靠缩进判断「谁属于谁」，缩进错一格，它就以为代码断句断了。",
     "causes": [
-      { "text": "if / for / def / while 的下一行没缩进", "check": "看冒号下一行，行首是不是空的" },
-      { "text": "上一行冒号漏了", "check": "往上翻一行，结尾有没有冒号 :" },
-      { "text": "复制粘贴时缩进被吃了 / 空格和 Tab 混用", "check": "全选该段落 → 用 Tab 重新缩进一次，别混着用空格" }
+      {
+        "text": "if / for / def / while 的下一行没缩进",
+        "check": "看冒号下一行，行首是不是空的"
+      },
+      {
+        "text": "上一行冒号漏了",
+        "check": "往上翻一行，结尾有没有冒号 :"
+      },
+      {
+        "text": "复制粘贴时缩进被吃了 / 空格和 Tab 混用",
+        "check": "全选该段落 → 用 Tab 重新缩进一次，别混着用空格"
+      }
     ],
     "firstStep": "先别通读代码。把光标停在这行行首，按一次 Tab，再跑一次，看报错是不是变了。",
     "concept": "缩进语法",
@@ -32,13 +61,26 @@
   {
     "id": "err-modulenotfound",
     "type": "ModuleNotFoundError",
-    "patterns": ["ModuleNotFoundError", "No module named", "ImportError"],
+    "patterns": [
+      "ModuleNotFoundError",
+      "No module named",
+      "ImportError"
+    ],
     "raw": "ModuleNotFoundError: No module named 'pandas'",
     "plain": "Python 在说：它不认识 pandas 这个东西。要么没装，要么装在了另一个 Python 环境里。",
     "causes": [
-      { "text": "根本没安装", "check": "命令行输入 pip show pandas，看有没有版本号返回" },
-      { "text": "装到了别的 Python 环境（多个 Python 打架）", "check": "python -c \"import sys; print(sys.executable)\" 看你在用哪个 Python" },
-      { "text": "库名写错（大小写/别名）", "check": "确认 import 后面写的是库名，不是 pip 安装名" }
+      {
+        "text": "根本没安装",
+        "check": "命令行输入 pip show pandas，看有没有版本号返回"
+      },
+      {
+        "text": "装到了别的 Python 环境（多个 Python 打架）",
+        "check": "python -c \"import sys; print(sys.executable)\" 看你在用哪个 Python"
+      },
+      {
+        "text": "库名写错（大小写/别名）",
+        "check": "确认 import 后面写的是库名，不是 pip 安装名"
+      }
     ],
     "firstStep": "先看你的解释器是谁：运行 python -c \"import sys; print(sys.executable)\"，再用同一个解释器执行 python -m pip install pandas。",
     "concept": "pip 与环境",
@@ -47,13 +89,24 @@
   {
     "id": "err-keyerror",
     "type": "KeyError",
-    "patterns": ["KeyError"],
+    "patterns": [
+      "KeyError"
+    ],
     "raw": "KeyError: '成绩'",
     "plain": "你用一个不存在的列名去取数据。表格里没有叫「成绩」的列，可能是名字有空格、是全角、或者叫「总成绩」。",
     "causes": [
-      { "text": "列名前后有看不见的空格", "check": "打印 list(df.columns) 看真实列名" },
-      { "text": "列名被读成了表头以外的样子（header 不对）", "check": "打印 df.head()，看第一行是不是被当成了数据" },
-      { "text": "该列在另一张表 / 另一个 sheet", "check": "确认你读的是哪张表、哪个 sheet" }
+      {
+        "text": "列名前后有看不见的空格",
+        "check": "打印 list(df.columns) 看真实列名"
+      },
+      {
+        "text": "列名被读成了表头以外的样子（header 不对）",
+        "check": "打印 df.head()，看第一行是不是被当成了数据"
+      },
+      {
+        "text": "该列在另一张表 / 另一个 sheet",
+        "check": "确认你读的是哪张表、哪个 sheet"
+      }
     ],
     "firstStep": "先打印 list(df.columns) 和 df.head()，用屏幕上真实出现的列名，一个字一个字抄进代码。",
     "concept": "DataFrame 概念",
@@ -62,13 +115,27 @@
   {
     "id": "err-valueerror-csv",
     "type": "UnicodeDecodeError",
-    "patterns": ["UnicodeDecodeError", "codec can't decode", "gbk", "utf-8"],
+    "patterns": [
+      "UnicodeDecodeError",
+      "codec can't decode",
+      "gbk",
+      "utf-8"
+    ],
     "raw": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xd0 in position 0",
     "plain": "中文表格常见问题：这个文件不是 UTF-8 编码（多半是 Excel 存的 GBK），Python 用错字典去读它。",
     "causes": [
-      { "text": "文件是 GBK / ANSI 编码", "check": "读的时候加 encoding='gbk' 试一次" },
-      { "text": "文件其实是 UTF-8 带 BOM", "check": "加 encoding='utf-8-sig' 试一次" },
-      { "text": "文件根本不是文本（.xlsx 当成 .csv）", "check": "看后缀，Excel 文件要用 read_excel" }
+      {
+        "text": "文件是 GBK / ANSI 编码",
+        "check": "读的时候加 encoding='gbk' 试一次"
+      },
+      {
+        "text": "文件其实是 UTF-8 带 BOM",
+        "check": "加 encoding='utf-8-sig' 试一次"
+      },
+      {
+        "text": "文件根本不是文本（.xlsx 当成 .csv）",
+        "check": "看后缀，Excel 文件要用 read_excel"
+      }
     ],
     "firstStep": "先只改读取那一行：pd.read_csv('成绩.csv', encoding='gbk')，别的先不动。",
     "concept": "编码与读取",
@@ -77,13 +144,26 @@
   {
     "id": "err-typeerror-mean",
     "type": "TypeError",
-    "patterns": ["TypeError", "unsupported operand", "can only concatenate"],
+    "patterns": [
+      "TypeError",
+      "unsupported operand",
+      "can only concatenate"
+    ],
     "raw": "TypeError: unsupported operand type(s) for /: 'str' and 'int'",
     "plain": "你在拿文字当数字算。这列里存的是「89」这种字符串，不是数字 89，所以不能做除法。",
     "causes": [
-      { "text": "列被读成了字符串（有空格、单位、中文）", "check": "打印 df['成绩'].dtype 看是 object 还是 int64" },
-      { "text": "表头行被当成了数据", "check": "打印 df.head()，看第一行是不是列名" },
-      { "text": "数据里有「缺考」「-」这类非数字", "check": "打印 df['成绩'].unique() 看前 20 个值" }
+      {
+        "text": "列被读成了字符串（有空格、单位、中文）",
+        "check": "打印 df['成绩'].dtype 看是 object 还是 int64"
+      },
+      {
+        "text": "表头行被当成了数据",
+        "check": "打印 df.head()，看第一行是不是列名"
+      },
+      {
+        "text": "数据里有「缺考」「-」这类非数字",
+        "check": "打印 df['成绩'].unique() 看前 20 个值"
+      }
     ],
     "firstStep": "先看一眼类型：print(df['成绩'].dtype)。如果是 object，再用 pd.to_numeric(df['成绩'], errors='coerce') 转成数字。",
     "concept": "数据类型",
@@ -92,13 +172,25 @@
   {
     "id": "err-convert-float",
     "type": "ValueError",
-    "patterns": ["could not convert string to float", "invalid literal for"],
+    "patterns": [
+      "could not convert string to float",
+      "invalid literal for"
+    ],
     "raw": "ValueError: could not convert string to float: '89分'",
     "plain": "这一列里混进了「89分」这种带文字的值。程序想把它当数字，但「分」这个字它不认识。",
     "causes": [
-      { "text": "分数后面带了单位，或写了「缺考」", "check": "打印 df['成绩'].unique() 看有哪些非数字" },
-      { "text": "全角数字 / 前后空格", "check": "df['成绩'].astype(str).str.strip() 再转数字" },
-      { "text": "表格里有合并单元格或小计行", "check": "打印 df.tail() 看最后几行是不是合计" }
+      {
+        "text": "分数后面带了单位，或写了「缺考」",
+        "check": "打印 df['成绩'].unique() 看有哪些非数字"
+      },
+      {
+        "text": "全角数字 / 前后空格",
+        "check": "df['成绩'].astype(str).str.strip() 再转数字"
+      },
+      {
+        "text": "表格里有合并单元格或小计行",
+        "check": "打印 df.tail() 看最后几行是不是合计"
+      }
     ],
     "firstStep": "先把它换成「能转就转，不能转就留空」：pd.to_numeric(df['成绩'], errors='coerce')，再数一数有几个空的。",
     "concept": "数据类型",
@@ -107,13 +199,25 @@
   {
     "id": "err-zerodivision",
     "type": "ZeroDivisionError",
-    "patterns": ["ZeroDivisionError", "division by zero"],
+    "patterns": [
+      "ZeroDivisionError",
+      "division by zero"
+    ],
     "raw": "ZeroDivisionError: division by zero",
     "plain": "你在拿 0 做除数——多半是「这一组没有数据」却仍然去算平均值。",
     "causes": [
-      { "text": "筛选后的表是空的", "check": "先 print(len(df)) 看还有没有行" },
-      { "text": "分组后某一组没有成绩", "check": "print(df.groupby('班级').size()) 看每组的行数" },
-      { "text": "分母字段是空值或 0", "check": "print(df['人数'].describe()) 看最小值" }
+      {
+        "text": "筛选后的表是空的",
+        "check": "先 print(len(df)) 看还有没有行"
+      },
+      {
+        "text": "分组后某一组没有成绩",
+        "check": "print(df.groupby('班级').size()) 看每组的行数"
+      },
+      {
+        "text": "分母字段是空值或 0",
+        "check": "print(df['人数'].describe()) 看最小值"
+      }
     ],
     "firstStep": "先在这行前面加一句 print(len(df))，确认不是空表；是空表就先修筛选条件。",
     "concept": "缺失值",
@@ -122,13 +226,25 @@
   {
     "id": "err-nameerror",
     "type": "NameError",
-    "patterns": ["NameError", "is not defined"],
+    "patterns": [
+      "NameError",
+      "is not defined"
+    ],
     "raw": "NameError: name 'df' is not defined",
     "plain": "你在用一个还没创建的东西。要么这行在前面，要么变量名拼错了、大小写不一致。",
     "causes": [
-      { "text": "变量还没赋值就用了", "check": "往上找第一次出现 df 的地方，看有没有 df = ..." },
-      { "text": "大小写/下划线不一致", "check": "Python 区分大小写，df 和 Df 是两个东西" },
-      { "text": "在函数内部用了函数外的变量", "check": "确认这个变量在函数里能看到（必要时当参数传进去）" }
+      {
+        "text": "变量还没赋值就用了",
+        "check": "往上找第一次出现 df 的地方，看有没有 df = ..."
+      },
+      {
+        "text": "大小写/下划线不一致",
+        "check": "Python 区分大小写，df 和 Df 是两个东西"
+      },
+      {
+        "text": "在函数内部用了函数外的变量",
+        "check": "确认这个变量在函数里能看到（必要时当参数传进去）"
+      }
     ],
     "firstStep": "先看报错给的行号，往上一行找：那个变量是不是在这一行之后才创建的。",
     "concept": "变量与作用域",
@@ -137,16 +253,141 @@
   {
     "id": "err-attributeerror",
     "type": "AttributeError",
-    "patterns": ["AttributeError", "has no attribute", "object has no attribute"],
+    "patterns": [
+      "AttributeError",
+      "has no attribute",
+      "object has no attribute"
+    ],
     "raw": "AttributeError: 'DataFrame' object has no attribute 'mean1'",
     "plain": "你在一个东西后面点了一个它没有的功能。多半是方法名打错，或者这个东西不是你以为的那种类型。",
     "causes": [
-      { "text": "方法名拼错（mean1 / avarage / readcsv）", "check": "对照课程示例，别凭记忆敲方法名" },
-      { "text": "把 Series 当 DataFrame 用（或反过来）", "check": "print(type(df['成绩'])) 看类型" },
-      { "text": "对整张表求单列的统计", "check": "先选列：df['成绩'].mean()，而不是 df.mean1()" }
+      {
+        "text": "方法名拼错（mean1 / avarage / readcsv）",
+        "check": "对照课程示例，别凭记忆敲方法名"
+      },
+      {
+        "text": "把 Series 当 DataFrame 用（或反过来）",
+        "check": "print(type(df['成绩'])) 看类型"
+      },
+      {
+        "text": "对整张表求单列的统计",
+        "check": "先选列：df['成绩'].mean()，而不是 df.mean1()"
+      }
     ],
     "firstStep": "先打印 type(...) 看手里这个东西到底是什么，再决定它有没有这个方法。",
     "concept": "DataFrame 概念",
+    "analogyId": "ana-table"
+  },
+  {
+    "id": "err-emptydata",
+    "type": "EmptyDataError",
+    "patterns": [
+      "EmptyDataError",
+      "No columns to parse",
+      "空文件"
+    ],
+    "raw": "pandas.errors.EmptyDataError: No columns to parse from file",
+    "plain": "这个文件是空的，或者只有表头没有数据。Python 打开一看没内容，就不知道该怎么读了。",
+    "causes": [
+      {
+        "text": "文件确实没数据（只存了表头）",
+        "check": "用记事本打开文件，看有没有第二行"
+      },
+      {
+        "text": "文件被 Excel 另存成了空表",
+        "check": "看文件大小是不是 0 KB"
+      },
+      {
+        "text": "分隔符不对（其实不是 CSV）",
+        "check": "看文件是不是 .txt 或 .xlsx 改的后缀"
+      }
+    ],
+    "firstStep": "先用记事本打开看一眼内容。空的就重新导出一次；有内容就检查分隔符是不是英文逗号。",
+    "concept": "数据读取",
+    "analogyId": "ana-empty"
+  },
+  {
+    "id": "err-permission",
+    "type": "PermissionError",
+    "patterns": [
+      "PermissionError",
+      "Permission denied",
+      "拒绝访问"
+    ],
+    "raw": "PermissionError: [Errno 13] Permission denied: '成绩.csv'",
+    "plain": "这个文件被别的程序占着，或者你没有权限动它。最常见的情况是：文件正在 Excel 里打开着。",
+    "causes": [
+      {
+        "text": "文件在 Excel / WPS 里开着",
+        "check": "把 Excel 那个窗口关掉再跑"
+      },
+      {
+        "text": "文件设了只读",
+        "check": "右键文件 → 属性 → 取消\"只读\""
+      },
+      {
+        "text": "文件在系统保护目录",
+        "check": "换个位置（比如桌面）再试"
+      }
+    ],
+    "firstStep": "先把 Excel 里打开的那个文件关掉，再跑一次。九成是这个问题。",
+    "concept": "文件操作",
+    "analogyId": "ana-permission"
+  },
+  {
+    "id": "err-jsondecode",
+    "type": "JSONDecodeError",
+    "patterns": [
+      "JSONDecodeError",
+      "Expecting value",
+      "json 解析"
+    ],
+    "raw": "json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "plain": "你让它读的是一个 JSON 文件，但文件里不是合法 JSON。多半是打开了一个空的、或者 HTML 报错页。",
+    "causes": [
+      {
+        "text": "文件是空的",
+        "check": "看文件大小是不是 0"
+      },
+      {
+        "text": "下载下来的是错误页而不是数据",
+        "check": "用记事本打开，看开头是不是 <!DOCTYPE html>"
+      },
+      {
+        "text": "JSON 里有多余逗号 / 注释",
+        "check": "在线 JSON 校验器过一遍"
+      }
+    ],
+    "firstStep": "先 print 文件前 200 个字符，确认它到底长什么样，再决定怎么解析。",
+    "concept": "数据读取",
+    "analogyId": "ana-dictionary"
+  },
+  {
+    "id": "err-sheet",
+    "type": "工作表不存在",
+    "patterns": [
+      "Worksheet named",
+      "sheet 不存在",
+      "工作表不存在"
+    ],
+    "raw": "ValueError: Worksheet named '成绩' not found",
+    "plain": "这个 Excel 里没有叫这个名字的工作表。可能是名字写错，或者它其实叫「 Sheet1 」。",
+    "causes": [
+      {
+        "text": "工作表名写错（空格、全角）",
+        "check": "打开 Excel 看底部标签的真实名字"
+      },
+      {
+        "text": "读的是另一个文件",
+        "check": "确认文件路径没写错"
+      },
+      {
+        "text": "用了 sheet_name=None 但后面按名字取",
+        "check": "sheet_name=None 返回的是字典"
+      }
+    ],
+    "firstStep": "先打印 pd.ExcelFile(路径).sheet_names，看真实名字，再照抄。",
+    "concept": "数据读取",
     "analogyId": "ana-table"
   }
 ]

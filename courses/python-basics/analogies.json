@@ -1,26 +1,158 @@
 [
-  { "id": "ana-address", "concept": "路径", "analogy": "快递员送件：只写收件人名字不够，得写全家庭住址。", "explain": "代码里的路径就是文件的家庭住址——写全了，才能送到。" },
-  { "id": "ana-store", "concept": "pip", "analogy": "pip 像手机的应用商店。", "explain": "先「下载安装」（pip install），再「打开它」（import），两步缺一不可。" },
-  { "id": "ana-indent", "concept": "缩进", "analogy": "缩进像写作文的段落。", "explain": "同一段的句子要齐头，Python 靠「齐不齐」判断哪些句子属于同一段。" },
-  { "id": "ana-table", "concept": "DataFrame", "analogy": "DataFrame 就是 Excel 里的一张表。", "explain": "行是记录，列是字段；df['成绩'] 就是抽出「成绩」这一列。" },
-  { "id": "ana-dictionary", "concept": "编码", "analogy": "编码像翻译：同一个文件，用错字典就翻译成乱码。", "explain": "GBK 和 UTF-8 是两本不同的字典，中文文件常需要换一本试。" },
-  { "id": "ana-number", "concept": "类型", "analogy": "「89」和 89 长得一样，一个是文字一个是数字。", "explain": "文字不能做除法，数字可以；先看 dtype，再决定转不转。" },
-  { "id": "ana-average", "concept": "mean", "analogy": "平均分就是把全班的分数倒在一起，再平均分给每个人。", "explain": "代码里 mean() 就干这一件事，不用自己写循环。" },
-  { "id": "ana-sort", "concept": "groupby", "analogy": "先把牌按花色分堆，再数每堆几张。", "explain": "groupby 就是「分堆」，后面的 mean/sum 是「每堆怎么数」。" },
-  { "id": "ana-debug", "concept": "报错", "analogy": "报错不是老师批评你，是导航在说「前方路口请右转」。", "explain": "它只是告诉你哪里对不上信息，读完最后一行再往回找。" },
-  { "id": "ana-loop", "concept": "循环", "analogy": "循环像流水线：每个零件都过同一道工序。", "explain": "for 把每个元素依次交给你，一次处理一个。" },
-  { "id": "ana-index", "concept": "索引", "analogy": "索引像书的目录页码。", "explain": "按页码翻比一页页找快得多，但页码变了，目录也要跟着改。" },
-  { "id": "ana-nan", "concept": "缺失值", "analogy": "NaN 像成绩单上的空格——不是 0 分，是没填。", "explain": "空格不能当 0 算，得先决定是补上还是跳过。" },
-  { "id": "ana-loc", "concept": "切片", "analogy": "loc 是按门牌号找，iloc 是按第几排第几号找。", "explain": "loc 用列名/索引标签，iloc 用位置数字，别混用。" },
-  { "id": "ana-chart", "concept": "可视化", "analogy": "图表像给数据拍一张证件照。", "explain": "选对图表类型，数据长什么样一眼就看出来；选错了反而骗人。" },
-  { "id": "ana-rename", "concept": "列名", "analogy": "rename 像给文件改名，不是复制一份新的。", "explain": "改名要写 inplace=True 或者接住返回值，否则表没变。" },
-  { "id": "ana-copy", "concept": "赋值", "analogy": "df2 = df 不是复制一张表，是给同一张表起了个新名字。", "explain": "改 df2 会连 df 一起变；要真复制得用 .copy()。" },
-  { "id": "ana-fillna", "concept": "填充", "analogy": "fillna 像把空格用铅笔先填上，之后能擦掉。", "explain": "填 0 是假设，填均值是折中；先想清楚哪天要重来。" },
-  { "id": "ana-astype", "concept": "类型转换", "analogy": "astype 像把一叠纸换成硬币，换不了的会当场报警。", "explain": "转换前先看有没有脏数据，否则整列都会报错。" },
-  { "id": "ana-merge", "concept": "合并", "analogy": "merge 像两本点名册按学号对齐。", "explain": "对齐用的那一列必须干净，否则对不上的人会凭空消失。" },
-  { "id": "ana-dropna", "concept": "删除缺失", "analogy": "dropna 像把有空格的行整行撕掉。", "explain": "撕掉的是整行数据，撕之前先数数还剩几行。" },
-  { "id": "ana-sortvalues", "concept": "排序", "analogy": "sort_values 像把一摞卷子按分数从高到低排好。", "explain": "排完记得 reset_index，不然行号还是旧的顺序。" },
-  { "id": "ana-print", "concept": "print", "analogy": "print 像把抽屉拉开看一眼，不是把东西收好。", "explain": "它只负责显示，不会改变数据本身。" },
-  { "id": "ana-import", "concept": "import", "analogy": "import 像把工具箱搬到工作台，不是把工具改成自己的。", "explain": "as pd 只是给工具箱起个简称，方便后面少打几个字。" },
-  { "id": "ana-error-lastline", "concept": "看报错", "analogy": "报错像快递单，最后一行才是收件人。", "explain": "Python 的报错要从最后一行往上读，最后一行写着真正出事的类型和位置。" }
+  {
+    "id": "ana-address",
+    "concept": "路径",
+    "analogy": "快递员送件：只写收件人名字不够，得写全家庭住址。",
+    "explain": "代码里的路径就是文件的家庭住址——写全了，才能送到。"
+  },
+  {
+    "id": "ana-store",
+    "concept": "pip",
+    "analogy": "pip 像手机的应用商店。",
+    "explain": "先「下载安装」（pip install），再「打开它」（import），两步缺一不可。"
+  },
+  {
+    "id": "ana-indent",
+    "concept": "缩进",
+    "analogy": "缩进像写作文的段落。",
+    "explain": "同一段的句子要齐头，Python 靠「齐不齐」判断哪些句子属于同一段。"
+  },
+  {
+    "id": "ana-table",
+    "concept": "DataFrame",
+    "analogy": "DataFrame 就是 Excel 里的一张表。",
+    "explain": "行是记录，列是字段；df['成绩'] 就是抽出「成绩」这一列。"
+  },
+  {
+    "id": "ana-dictionary",
+    "concept": "编码",
+    "analogy": "编码像翻译：同一个文件，用错字典就翻译成乱码。",
+    "explain": "GBK 和 UTF-8 是两本不同的字典，中文文件常需要换一本试。"
+  },
+  {
+    "id": "ana-number",
+    "concept": "类型",
+    "analogy": "「89」和 89 长得一样，一个是文字一个是数字。",
+    "explain": "文字不能做除法，数字可以；先看 dtype，再决定转不转。"
+  },
+  {
+    "id": "ana-average",
+    "concept": "mean",
+    "analogy": "平均分就是把全班的分数倒在一起，再平均分给每个人。",
+    "explain": "代码里 mean() 就干这一件事，不用自己写循环。"
+  },
+  {
+    "id": "ana-sort",
+    "concept": "groupby",
+    "analogy": "先把牌按花色分堆，再数每堆几张。",
+    "explain": "groupby 就是「分堆」，后面的 mean/sum 是「每堆怎么数」。"
+  },
+  {
+    "id": "ana-debug",
+    "concept": "报错",
+    "analogy": "报错不是老师批评你，是导航在说「前方路口请右转」。",
+    "explain": "它只是告诉你哪里对不上信息，读完最后一行再往回找。"
+  },
+  {
+    "id": "ana-loop",
+    "concept": "循环",
+    "analogy": "循环像流水线：每个零件都过同一道工序。",
+    "explain": "for 把每个元素依次交给你，一次处理一个。"
+  },
+  {
+    "id": "ana-index",
+    "concept": "索引",
+    "analogy": "索引像书的目录页码。",
+    "explain": "按页码翻比一页页找快得多，但页码变了，目录也要跟着改。"
+  },
+  {
+    "id": "ana-nan",
+    "concept": "缺失值",
+    "analogy": "NaN 像成绩单上的空格——不是 0 分，是没填。",
+    "explain": "空格不能当 0 算，得先决定是补上还是跳过。"
+  },
+  {
+    "id": "ana-loc",
+    "concept": "切片",
+    "analogy": "loc 是按门牌号找，iloc 是按第几排第几号找。",
+    "explain": "loc 用列名/索引标签，iloc 用位置数字，别混用。"
+  },
+  {
+    "id": "ana-chart",
+    "concept": "可视化",
+    "analogy": "图表像给数据拍一张证件照。",
+    "explain": "选对图表类型，数据长什么样一眼就看出来；选错了反而骗人。"
+  },
+  {
+    "id": "ana-rename",
+    "concept": "列名",
+    "analogy": "rename 像给文件改名，不是复制一份新的。",
+    "explain": "改名要写 inplace=True 或者接住返回值，否则表没变。"
+  },
+  {
+    "id": "ana-copy",
+    "concept": "赋值",
+    "analogy": "df2 = df 不是复制一张表，是给同一张表起了个新名字。",
+    "explain": "改 df2 会连 df 一起变；要真复制得用 .copy()。"
+  },
+  {
+    "id": "ana-fillna",
+    "concept": "填充",
+    "analogy": "fillna 像把空格用铅笔先填上，之后能擦掉。",
+    "explain": "填 0 是假设，填均值是折中；先想清楚哪天要重来。"
+  },
+  {
+    "id": "ana-astype",
+    "concept": "类型转换",
+    "analogy": "astype 像把一叠纸换成硬币，换不了的会当场报警。",
+    "explain": "转换前先看有没有脏数据，否则整列都会报错。"
+  },
+  {
+    "id": "ana-merge",
+    "concept": "合并",
+    "analogy": "merge 像两本点名册按学号对齐。",
+    "explain": "对齐用的那一列必须干净，否则对不上的人会凭空消失。"
+  },
+  {
+    "id": "ana-dropna",
+    "concept": "删除缺失",
+    "analogy": "dropna 像把有空格的行整行撕掉。",
+    "explain": "撕掉的是整行数据，撕之前先数数还剩几行。"
+  },
+  {
+    "id": "ana-sortvalues",
+    "concept": "排序",
+    "analogy": "sort_values 像把一摞卷子按分数从高到低排好。",
+    "explain": "排完记得 reset_index，不然行号还是旧的顺序。"
+  },
+  {
+    "id": "ana-print",
+    "concept": "print",
+    "analogy": "print 像把抽屉拉开看一眼，不是把东西收好。",
+    "explain": "它只负责显示，不会改变数据本身。"
+  },
+  {
+    "id": "ana-import",
+    "concept": "import",
+    "analogy": "import 像把工具箱搬到工作台，不是把工具改成自己的。",
+    "explain": "as pd 只是给工具箱起个简称，方便后面少打几个字。"
+  },
+  {
+    "id": "ana-error-lastline",
+    "concept": "看报错",
+    "analogy": "报错像快递单，最后一行才是收件人。",
+    "explain": "Python 的报错要从最后一行往上读，最后一行写着真正出事的类型和位置。"
+  },
+  {
+    "id": "ana-empty",
+    "concept": "空文件",
+    "analogy": "空文件像打开一个空盒子：伸手进去什么都摸不到。",
+    "explain": "程序会问「数据在哪」，因为它连列名都没读到。"
+  },
+  {
+    "id": "ana-permission",
+    "concept": "文件权限",
+    "analogy": "文件被占用像门从里面反锁了。",
+    "explain": "关掉占用它的程序（通常是 Excel），门就开了。"
+  }
 ]
