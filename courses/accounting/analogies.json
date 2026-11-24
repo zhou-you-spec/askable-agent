@@ -1,0 +1,10 @@
+[
+  { "id": "acc-scale", "concept": "借贷", "analogy": "借贷像一架天平：右边放多少，左边就得放多少。", "explain": "两边永远相等，这就是「有借必有贷，借贷必相等」。" },
+  { "id": "acc-drawer", "concept": "科目", "analogy": "会计科目像文件柜的抽屉，每个抽屉放一类业务。", "explain": "编码就是抽屉编号，编号错了东西就放错地方。" },
+  { "id": "acc-receipt", "concept": "凭证", "analogy": "凭证像每笔消费的小票，写清时间、内容、金额。", "explain": "小票留不全，账就对不上；凭证乱，报表就乱。" },
+  { "id": "acc-lock", "concept": "结账", "analogy": "结账像把账本合上、上个锁。", "explain": "要再改，得先开锁（反结账），而且要有理由。" },
+  { "id": "acc-start", "concept": "期初", "analogy": "期初余额像跑步的起点线站歪了，后面每一步都歪。", "explain": "起点必须先对平，再往下走。" },
+  { "id": "acc-check", "concept": "核对", "analogy": "对账像月底对账单：一笔一笔勾。", "explain": "差额就是线索，顺着金额去找那笔业务。" },
+  { "id": "acc-order", "concept": "顺序", "analogy": "做账像做饭：先洗菜再下锅，顺序跳了就得重来。", "explain": "凭证→审核→记账→结转→结账，顺序不能乱。" },
+  { "id": "acc-backup", "concept": "备份", "analogy": "改账前先备份，像出门带伞。", "explain": "反结账、批量修改前先备份账套，出问题能回去。" }
+]

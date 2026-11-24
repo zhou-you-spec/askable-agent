@@ -1,0 +1,110 @@
+[
+  {
+    "id": "con-pip",
+    "name": "pip",
+    "aliases": ["pip", "安装库", "装库", "第三方库"],
+    "analogyId": "ana-store",
+    "short": "Python 的「应用商店」，专门装别人写好的工具包（库）。",
+    "term": "pip 是 Python 的包管理工具，从 PyPI 仓库存取第三方库，命令形如 pip install 库名。",
+    "note": "装完后要用 import 才能用；pip 装的是「工具」，import 是「把工具拿到手里」。"
+  },
+  {
+    "id": "con-dataframe",
+    "name": "DataFrame",
+    "aliases": ["dataframe", "df", "数据框", "表格数据结构"],
+    "analogyId": "ana-table",
+    "short": "一张带行号、带列名的电子表格。",
+    "term": "pandas 的二维数据结构，行有索引（index），列有列名（columns），支持按列筛选、聚合、合并。",
+    "note": "df['列名'] 取一列，df.loc[行, 列] 取具体格子。新手最容易错在列名写错。"
+  },
+  {
+    "id": "con-path",
+    "name": "路径与工作目录",
+    "aliases": ["路径", "工作目录", "相对路径", "绝对路径", "os.getcwd"],
+    "analogyId": "ana-address",
+    "short": "文件在电脑里的「家庭住址」；相对路径是「从我现在站的地方怎么走」。",
+    "term": "相对路径从程序运行时的当前工作目录（cwd）算起；绝对路径从盘符写起。",
+    "note": "两个「位置」要分清：文件在哪（绝对路径），代码在哪跑（cwd）。对不上就报 FileNotFoundError。"
+  },
+  {
+    "id": "con-indent",
+    "name": "缩进语法",
+    "aliases": ["缩进", "indent", "tab", "空格"],
+    "analogyId": "ana-indent",
+    "short": "Python 的「括号」，用空格表示谁包含谁。",
+    "term": "冒号后的代码块必须统一缩进（通常 4 个空格），缩进决定代码归属，空格与 Tab 不能混用。",
+    "note": "看到 IndentationError，先看冒号下一行，而不是通读全文。"
+  },
+  {
+    "id": "con-readcsv",
+    "name": "read_csv",
+    "aliases": ["read_csv", "读取csv", "读表格", "导入数据"],
+    "analogyId": "ana-address",
+    "short": "把表格文件搬进 Python，变成一张 DataFrame。",
+    "term": "pandas.read_csv(路径, encoding=...) 读取 CSV；编码不对会报 UnicodeDecodeError。",
+    "note": "读取失败 90% 是路径问题，10% 是编码问题，先查路径。"
+  },
+  {
+    "id": "con-mean",
+    "name": "mean 平均值",
+    "aliases": ["mean", "平均值", "平均分", "求平均"],
+    "analogyId": "ana-average",
+    "short": "把一列数加起来，除以个数。",
+    "term": "Series.mean() 求算术平均，默认跳过缺失值（NaN）。",
+    "note": "如果结果是 NaN，看看这列是不是被读成了字符串，或者全是缺失值。"
+  },
+  {
+    "id": "con-type",
+    "name": "数据类型",
+    "aliases": ["数据类型", "dtype", "类型转换", "to_numeric", "astype"],
+    "analogyId": "ana-number",
+    "short": "同样是「89」，带引号是文字，不带引号是数字，能算的只有数字。",
+    "term": "pandas 用 dtype 表示列类型，object 通常是字符串；用 astype 或 to_numeric 转换。",
+    "note": "先打印 dtype 再决定怎么转，不要上来就整表强转。"
+  },
+  {
+    "id": "con-groupby",
+    "name": "groupby 分组",
+    "aliases": ["groupby", "分组", "按班级统计"],
+    "analogyId": "ana-sort",
+    "short": "先把卡片按某一列分堆，再每堆各算各的。",
+    "term": "df.groupby('班级')['成绩'].mean() 按组聚合，返回以组为索引的 Series。",
+    "note": "分组后再取值，索引变了，记得 reset_index() 变回普通表。"
+  },
+  {
+    "id": "con-nan",
+    "name": "缺失值",
+    "aliases": ["缺失值", "nan", "空值", "dropna", "fillna"],
+    "analogyId": "ana-nan",
+    "short": "表格里的空格——不是 0，是没填。",
+    "term": "pandas 用 NaN 表示缺失；df.isna().sum() 能数出每列缺几个，dropna / fillna 决定删还是补。",
+    "note": "先数清楚缺多少再动手，别一上来就整表 dropna。"
+  },
+  {
+    "id": "con-index",
+    "name": "索引 index",
+    "aliases": ["索引", "index", "行号"],
+    "analogyId": "ana-index",
+    "short": "每行数据的门牌号。",
+    "term": "pandas 的 Index 标识每一行；筛选、排序后索引可能乱序，用 reset_index(drop=True) 重排。",
+    "note": "报错里看到 index，多半是行列对不上，先 print(df.index)。"
+  },
+  {
+    "id": "con-slice",
+    "name": "切片 loc/iloc",
+    "aliases": ["loc", "iloc", "切片", "取某一行"],
+    "analogyId": "ana-loc",
+    "short": "loc 按标签找，iloc 按位置找。",
+    "term": "df.loc[行标签, 列名] 用名字；df.iloc[第几行, 第几列] 用数字（从 0 开始）。",
+    "note": "两个别混用，混用最常见的后果是拿到意料之外的行。"
+  },
+  {
+    "id": "con-scope",
+    "name": "变量与作用域",
+    "aliases": ["变量", "作用域", "nameerror", "未定义"],
+    "analogyId": "ana-import",
+    "short": "变量名是贴在盒子上的标签，盒子得先有。",
+    "term": "变量先赋值后使用；函数内部默认看不到函数外的局部变量，必要时通过参数传入。",
+    "note": "NameError 几乎总是「用在前、建在后」或名字打错。"
+  }
+]

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>问不出口的那道题 · 实训答疑助教</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">问</div>
+      <div>
+        <h1>问不出口的那道题</h1>
+        <p class="sub">一个不会嘲笑你的实训答疑助教 · 档位永远由你拨</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="recordBtn" class="ghost" type="button">我的记录</button>
+      <button id="helpBtn" class="ghost" type="button">怎么用</button>
+      <button id="reportBtn" class="ghost" type="button">教师周报</button>
+    </div>
+  </header>
+
+  <section class="panel">
+    <div class="row">
+      <span class="label">课程</span>
+      <select id="courseSel" class="select" title="换课程只换知识库，机制不变"></select>
+      <span class="label mini-label">班级码</span>
+      <input id="classInput" class="mini" placeholder="可选，老师给" maxlength="16" />
+      <a class="ghost small" href="/teacher.html" target="_blank" rel="noopener">教师看板 →</a>
+    </div>
+    <div class="row">
+      <span class="label">求助深度</span>
+      <div class="seg" id="depthSeg">
+        <button data-depth="1" class="on" title="只给思路，不给代码">1 档 · 只给思路</button>
+        <button data-depth="2" title="只点出关键的一行">2 档 · 关键一行</button>
+        <button data-depth="3" title="完整代码 + 逐行讲解">3 档 · 完整代码</button>
+      </div>
+    </div>
+    <div class="row">
+      <span class="label">讲解粒度</span>
+      <div class="seg" id="grainSeg">
+        <button data-grain="line" title="每一行都讲">逐行讲</button>
+        <button data-grain="card" class="on" title="只讲卡住的那几步">只讲卡住的</button>
+        <button data-grain="code" title="只贴代码，不讲解">只给代码</button>
+      </div>
+    </div>
+    <div class="chips">
+      <span class="chip" id="chipDepth">当前档位：1 档 · 只给思路</span>
+      <span class="chip" id="chipSkip">本次跳过：无</span>
+      <span class="chip" id="chipMute">长期跳过：无</span>
+      <span class="chip" id="chipLearned">已掌握：无</span>
+    </div>
+  </section>
+
+  <main class="chat" id="chat" aria-live="polite"></main>
+
+  <div class="quick" id="quick"></div>
+
+  <footer class="composer">
+    <textarea id="input" rows="1" aria-label="输入你的问题" placeholder="把报错整段贴过来，或者问：pip 是什么？（放心，这里不问你是谁）"></textarea>
+    <button id="micBtn" class="ghost" type="button" aria-label="语音输入" title="按一下，说出你的问题">🎤</button>
+    <button id="sendBtn" type="button">发送</button>
+  </footer>
+  <p class="privacy">不收取姓名、学号、手机号 · 只有随机会话号 · 日志只留问题摘要</p>
+</div>
+
+<!-- 首次使用引导 -->
+<div class="modal" id="onboard" hidden>
+  <div class="modal-card narrow">
+    <div class="slide" data-slide="0">
+      <div class="big-emoji">🫱</div>
+      <h2>它会先接住你，而不是先给答案</h2>
+      <p>卡住了、报错了、连问题都不知道怎么问——都可以直接说。这里没有"这么简单都不会"。</p>
+    </div>
+    <div class="slide" data-slide="1" hidden>
+      <div class="big-emoji">🎚️</div>
+      <h2>讲多深，你说了算</h2>
+      <p>1 档只给思路，2 档点出关键一行，3 档才给完整代码。想多听一点，说"再给点提示"；想直接要代码，说"我放弃了"。</p>
+    </div>
+    <div class="slide" data-slide="2" hidden>
+      <div class="big-emoji">🔒</div>
+      <h2>这里不问你是谁</h2>
+      <p>不收姓名学号，只有随机会话号，聊完就走。高频卡点会匿名汇总给老师看，但只到班级，不落到个人。</p>
+    </div>
+    <div class="modal-foot">
+      <span class="dots"><i class="on"></i><i></i><i></i></span>
+      <button id="onboardNext" class="primary" type="button">下一步</button>
+    </div>
+  </div>
+</div>
+
+<!-- 教师周报 -->
+<div class="modal" id="reportModal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>教师周报</h2>
+      <span class="sample" id="reportSample"></span>
+      <button id="exportCsv" class="ghost" type="button">导出 CSV</button>
+      <button id="closeReport" class="ghost" type="button">关闭</button>
+    </div>
+    <p class="note" id="reportNote"></p>
+    <h3>本周高频卡点 TOP3</h3>
+    <div id="reportBars" class="bars"></div>
+    <h3>求助档位分布</h3>
+    <div id="reportDepth" class="bars"></div>
+    <h3>近 7 天求助趋势</h3>
+    <div id="reportTrend" class="trend"></div>
+    <h3>一条教学建议</h3>
+    <p class="advice" id="reportAdvice"></p>
+    <p class="note">学生那边是陪伴，老师这边是仪表盘——同一份记录，两种温度。</p>
+  </div>
+</div>
+
+<!-- 访问码 -->
+<div class="gate" id="gate" hidden>
+  <div class="gate-card">
+    <h2>请输入访问码</h2>
+    <p>演示码：<b>demo</b>（评委只需输入这一个词）</p>
+    <input id="gateInput" placeholder="访问码" autocomplete="off" />
+    <button id="gateBtn" type="button">进入</button>
+    <p class="note" id="gateErr"></p>
+  </div>
+</div>
+
+<!-- 我的记录 -->
+<div class="modal" id="recordModal" hidden>
+  <div class="modal-card narrow">
+    <div class="modal-head">
+      <h2>我的记录</h2>
+      <button id="closeRecord" class="ghost" type="button">关闭</button>
+    </div>
+    <p class="note">只在这个浏览器里，不上传、不关联身份。</p>
+    <h3>已经掌握的</h3>
+    <div id="recordLearned" class="tags"></div>
+    <h3>还卡着的</h3>
+    <div id="recordStuck" class="tags"></div>
+    <p class="note">卡点记在这里没关系——它们是你下次复习的清单。</p>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

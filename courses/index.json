@@ -1,0 +1,29 @@
+{
+  "default": "python-basics",
+  "courses": [
+    {
+      "id": "python-basics",
+      "name": "Python 数据分析与建模",
+      "short": "Python",
+      "description": "读表、清洗、分组聚合与报错排查",
+      "teacher": "数据分析实训课",
+      "kind": "code"
+    },
+    {
+      "id": "excel",
+      "name": "Excel 数据处理与分析",
+      "short": "Excel",
+      "description": "引用、函数、透视表与常见错误值",
+      "teacher": "办公数据处理实训课",
+      "kind": "sheet"
+    },
+    {
+      "id": "accounting",
+      "name": "会计电算化",
+      "short": "会计",
+      "description": "凭证录入、科目设置、试算平衡与结账",
+      "teacher": "会计信息化实训课",
+      "kind": "ledger"
+    }
+  ]
+}

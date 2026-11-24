@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>教师看板 · 问不出口的那道题</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div class="teacher">
+  <div class="toolbar">
+    <div class="brand" style="flex:1">
+      <div class="logo">问</div>
+      <div>
+        <h1 style="margin:0;font-size:18px">教师看板</h1>
+        <p class="meta" style="margin:2px 0 0">同一份记录，两种温度：学生那边是陪伴，这边是仪表盘</p>
+      </div>
+    </div>
+    <a class="ghost small" href="/">← 回到学生端</a>
+  </div>
+
+  <div class="toolbar">
+    <label>课程
+      <select id="course" class="select"></select>
+    </label>
+    <label>班级码
+      <input id="klass" class="mini" placeholder="留空=全部" maxlength="16" />
+    </label>
+    <label>时间
+      <select id="days" class="select">
+        <option value="7" selected>近 7 天</option>
+        <option value="14">近 14 天</option>
+        <option value="30">近 30 天</option>
+      </select>
+    </label>
+    <button id="refresh" class="ghost">刷新</button>
+    <button id="csv" class="ghost">导出 CSV</button>
+    <button id="newCode" class="primary" style="padding:8px 16px">生成班级码</button>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="k">求助总次数</div><div class="v" id="mTotal">—</div></div>
+    <div class="card"><div class="k">1 档自行解决</div><div class="v" id="mD1">—</div></div>
+    <div class="card"><div class="k">2 档点拨后解决</div><div class="v" id="mD2">—</div></div>
+    <div class="card"><div class="k">3 档完整讲解</div><div class="v" id="mD3">—</div></div>
+  </div>
+
+  <div class="section">
+    <h3>数据口径</h3>
+    <p id="note" style="font-size:12.5px;color:#5b554e;margin:0"></p>
+  </div>
+
+  <div class="section">
+    <h3>本周高频卡点 TOP3</h3>
+    <div id="bars" class="bars"></div>
+  </div>
+
+  <div class="section">
+    <h3>近 7 天求助趋势</h3>
+    <div id="trend" class="trend"></div>
+  </div>
+
+  <div class="section">
+    <h3>课程分布</h3>
+    <div id="courses" class="bars"></div>
+  </div>
+
+  <div class="section">
+    <h3>一条教学建议</h3>
+    <p class="advice" id="advice"></p>
+  </div>
+
+  <div class="section">
+    <h3>班级码</h3>
+    <p style="font-size:12.5px;color:#5b554e;margin:0 0 10px">把下面这串码告诉学生，他们填在首页「班级码」里，你就能按班查看数据。班级码本身不含任何个人信息。</p>
+    <span class="code-badge" id="codeBadge">------</span>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+const code = localStorage.getItem('askable.code') || '';
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+
+async function get(path) {
+  const r = await fetch(path, { headers: { 'x-access-code': code } });
+  if (r.status === 401) {
+    const v = prompt('请输入访问码');
+    if (v) { localStorage.setItem('askable.code', v); location.reload(); }
+    return null;
+  }
+  return r.json();
+}
+
+function bars(box, items, fmt) {
+  box.innerHTML = '';
+  const max = Math.max(...items.map((x) => (fmt ? fmt(x) : x.count)), 1);
+  for (const it of items) {
+    const val = fmt ? fmt(it) : it.count;
+    const row = el('div', 'bar');
+    row.appendChild(el('span', '', it.name || it.level || it.id));
+    const track = el('div', 'track');
+    const fill = el('div', 'fill');
+    fill.style.width = Math.round((val / max) * 100) + '%';
+    track.appendChild(fill);
+    row.appendChild(track);
+    row.appendChild(el('span', '', String(val) + (it.pct !== undefined ? '%' : '')));
+    box.appendChild(row);
+  }
+}
+
+async function load() {
+  const course = $('#course').value;
+  const klass = $('#klass').value.trim();
+  const days = $('#days').value;
+  const q = new URLSearchParams({ days });
+  if (course) q.set('course', course);
+  if (klass) q.set('class', klass);
+  const r = await get('/api/report?' + q.toString());
+  if (!r) return;
+  $('#note').textContent = r.note || '';
+  const total = (r.topErrors || []).reduce((a, b) => a + b.count, 0);
+  $('#mTotal').textContent = r.sample ? String(total) : String(total);
+  const d = Object.fromEntries((r.depthDist || []).map((x) => [x.level, x.pct]));
+  $('#mD1').textContent = (d['1档 自行解决'] ?? 0) + '%';
+  $('#mD2').textContent = (d['2档 点拨后解决'] ?? 0) + '%';
+  $('#mD3').textContent = (d['3档 完整讲解'] ?? 0) + '%';
+  bars($('#bars'), (r.topErrors || []).map((x) => ({ name: x.name, count: x.count })));
+  bars($('#courses'), (r.courseDist || []).map((x) => ({ name: x.id, count: x.count, pct: x.pct })));
+  const tr = $('#trend');
+  tr.innerHTML = '';
+  const rows = (r.trend && r.trend.length ? r.trend : [{ date: '—', count: 0 }]);
+  const tmax = Math.max(...rows.map((x) => x.count), 1);
+  for (const t of rows) {
+    const col = el('div', 'tcol');
+    const bar = el('div', 'tbar');
+    bar.style.height = Math.max(4, Math.round((t.count / tmax) * 64)) + 'px';
+    bar.title = t.date + '：' + t.count + ' 次';
+    col.appendChild(bar);
+    col.appendChild(el('span', '', t.date));
+    tr.appendChild(col);
+  }
+  $('#advice').textContent = r.suggestion || '';
+}
+
+async function initCourses() {
+  const data = await get('/api/courses');
+  if (!data) return;
+  const sel = $('#course');
+  sel.innerHTML = '';
+  sel.appendChild(new Option('全部课程', ''));
+  for (const c of data.courses) sel.appendChild(new Option(c.name + `（${c.counts.errors} 类报错）`, c.id));
+  load();
+}
+
+$('#refresh').onclick = load;
+$('#course').onchange = load;
+$('#days').onchange = load;
+$('#klass').onchange = load;
+
+$('#csv').onclick = () => {
+  const q = new URLSearchParams({ days: $('#days').value });
+  if ($('#course').value) q.set('course', $('#course').value);
+  if ($('#klass').value.trim()) q.set('class', $('#klass').value.trim());
+  location.href = '/api/report.csv?' + q.toString();
+};
+
+$('#newCode').onclick = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  $('#codeBadge').textContent = s;
+  navigator.clipboard && navigator.clipboard.writeText(s).catch(() => {});
+};
+
+initCourses();
+</script>
+</body>
+</html>

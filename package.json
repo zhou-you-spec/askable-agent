@@ -1,0 +1,18 @@
+{
+  "name": "askable-agent",
+  "version": "2.0.0",
+  "private": true,
+  "description": "问不出口的那道题 —— 一个不会嘲笑你的实训答疑助教（三档求助 × 三档粒度，v2 多轮引导 / 换讲法 / 边界防护）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test/agent.test.js",
+    "accept": "node test.js",
+    "eval": "node eval.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

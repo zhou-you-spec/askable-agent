@@ -1,0 +1,92 @@
+[
+  {
+    "id": "ex-div0",
+    "type": "#DIV/0!",
+    "patterns": ["#DIV/0", "DIV/0", "除数为零", "除以0"],
+    "raw": "#DIV/0!",
+    "plain": "你在用一个 0 或空单元格做除数。表格里空单元格会被当成 0，所以「平均分」这类公式一碰到空行就爆。",
+    "causes": [
+      { "text": "分母单元格是空的", "check": "点一下作为分母的那一格，编辑栏里是不是什么都没有" },
+      { "text": "数据还没录完就拉了公式", "check": "看这一列是不是只有部分行有数" },
+      { "text": "分母本身是 0（比如人数统计为 0）", "check": "用 COUNT 或 COUNTA 先确认有几个人" }
+    ],
+    "firstStep": "先别删公式。在公式外面套一层 IFERROR，先把错误值变成空白：=IFERROR(原公式,\"\")。",
+    "concept": "错误值排查",
+    "analogyId": "ex-guard"
+  },
+  {
+    "id": "ex-ref",
+    "type": "#REF!",
+    "patterns": ["#REF", "REF!"],
+    "raw": "#REF!",
+    "plain": "公式引用的那个格子被删掉了，地址失效了。就像你记的门牌号，那栋楼被拆了。",
+    "causes": [
+      { "text": "删除了被引用的整行/整列", "check": "看公式里是不是出现了 #REF! 字样，点进去看引用的位置" },
+      { "text": "复制粘贴时相对引用跑偏", "check": "检查公式里 $ 用对没有（固定列/固定行）" },
+      { "text": "跨表引用，源表被改名或删除", "check": "看公式开头引用的表名还在不在" }
+    ],
+    "firstStep": "先按 Ctrl+Z 撤销删除，确认公式恢复；确认没问题后再决定要不要删数据。",
+    "concept": "引用方式",
+    "analogyId": "ex-address"
+  },
+  {
+    "id": "ex-value",
+    "type": "#VALUE!",
+    "patterns": ["#VALUE", "VALUE!"],
+    "raw": "#VALUE!",
+    "plain": "公式里混进了它算不了的东西，最常见的是「看着像数字的文字」参与加减乘除。",
+    "causes": [
+      { "text": "数字被存成了文本（左上角有小绿三角）", "check": "选中单元格，看左上角有没有绿色小三角" },
+      { "text": "数字前后有空格", "check": "用 =LEN(单元格) 看长度，比位数多就说明有空格" },
+      { "text": "区域里混了「缺考」「—」这类文字", "check": "筛选这一列，看有没有非数字" }
+    ],
+    "firstStep": "先选这一列，用「数据 → 分列 → 直接完成」把文本数字转成真数字，再算。",
+    "concept": "文本与数字",
+    "analogyId": "ex-number"
+  },
+  {
+    "id": "ex-name",
+    "type": "#NAME?",
+    "patterns": ["#NAME", "NAME?"],
+    "raw": "#NAME?",
+    "plain": "Excel 不认识你写的这个名字。多半是函数名拼错，或者引用的名称没定义。",
+    "causes": [
+      { "text": "函数名拼错（VLOKUP / SUMIFS 写成 SUMIF）", "check": "输入 =VLO 看有没有自动提示，跟着提示选" },
+      { "text": "中文引号包住了参数", "check": "公式里的引号必须是英文 \" \"" },
+      { "text": "用了别人定义的名称，但你没定义", "check": "公式 → 名称管理器 里看有没有这个名字" }
+    ],
+    "firstStep": "先把函数名删到只剩几个字母，让 Excel 弹出提示，从提示里选正确的函数。",
+    "concept": "函数与名称",
+    "analogyId": "ex-dictionary"
+  },
+  {
+    "id": "ex-na",
+    "type": "#N/A",
+    "patterns": ["#N/A", "N/A", "vlookup 找不到"],
+    "raw": "#N/A",
+    "plain": "VLOOKUP 在表里没找到要查的那个值。不是公式错了，是「查的人不在名单里」。",
+    "causes": [
+      { "text": "查找值和源表的值有空格/格式不同", "check": "两边都加 TRIM，或用 =A2=B2 直接比一比" },
+      { "text": "数字 vs 文本：一边是数字一边是文本", "check": "看两边对齐方式，文本默认左对齐" },
+      { "text": "第四参数写成 FALSE 但确实没有匹配", "check": "先去源表 Ctrl+F 搜一下这个值到底存不存在" }
+    ],
+    "firstStep": "先在源表里 Ctrl+F 搜这个值。搜不到，说明数据本身就没有；搜得到，就是格式不一致。",
+    "concept": "查找匹配",
+    "analogyId": "ex-dictionary"
+  },
+  {
+    "id": "ex-circular",
+    "type": "循环引用",
+    "patterns": ["循环引用", "circular reference"],
+    "raw": "循环引用警告",
+    "plain": "公式把自己算进去了，比如在 A1 里写 =A1+1。Excel 会一直转圈，因为它永远算不完。",
+    "causes": [
+      { "text": "公式区域包含了结果单元格本身", "check": "看公式的引用范围里有没有自己" },
+      { "text": "求和区域多选了一行（含合计行）", "check": "看 SUM 的范围是不是把合计那一行也框进去了" },
+      { "text": "跨表互相引用", "check": "两张表是不是都在引对方的结果" }
+    ],
+    "firstStep": "先点「公式 → 错误检查 → 循环引用」，Excel 会直接跳到出问题的格子。",
+    "concept": "公式范围",
+    "analogyId": "ex-loop"
+  }
+]
