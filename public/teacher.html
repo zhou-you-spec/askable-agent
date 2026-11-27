@@ -6,20 +6,49 @@
 <title>教师看板 · 问不出口的那道题</title>
 <link rel="stylesheet" href="/styles.css" />
 </head>
-<body>
+<body class="theme-neo">
+<script>
+  // 跟随学生端选择的主题（黑色 / 蓝色）
+  (function () {
+    function apply() {
+      var t = localStorage.getItem('askable.theme') === 'aurora' ? 'aurora' : 'neo';
+      document.body.classList.remove('theme-neo', 'theme-aurora');
+      document.body.classList.add('theme-' + t);
+    }
+    apply();
+    window.addEventListener('storage', function (e) {
+      if (e.key === 'askable.theme') apply();
+    });
+    window.__applyTheme = apply;
+  })();
+</script>
+<div class="fx" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
+
 <div class="teacher">
-  <div class="toolbar">
-    <div class="brand" style="flex:1">
-      <div class="logo">问</div>
+  <header class="t-hero">
+    <div class="t-brand">
+      <div class="logo">师</div>
       <div>
-        <h1 style="margin:0;font-size:18px">教师看板</h1>
-        <p class="meta" style="margin:2px 0 0">同一份记录，两种温度：学生那边是陪伴，这边是仪表盘</p>
+        <h1>教师看板</h1>
+        <p class="t-sub">同一份记录，两种温度：学生那边是陪伴，这边是仪表盘</p>
+        <div class="badges">
+          <span class="bg-item live"><i></i>实时更新</span>
+          <span class="bg-item">不记名</span>
+          <span class="bg-item">按班 / 按课看</span>
+        </div>
       </div>
     </div>
-    <a class="ghost small" href="/">← 回到学生端</a>
-  </div>
+    <div class="t-actions">
+      <button id="refresh" class="ghost small" type="button">刷新</button>
+      <button id="csv" class="ghost small" type="button">导出 CSV</button>
+      <button id="newCode" class="primary small" type="button">生成班级码</button>
+      <a class="ghost small" href="/">← 学生端</a>
+    </div>
+  </header>
 
-  <div class="toolbar">
+  <section class="t-toolbar">
     <label>课程
       <select id="course" class="select"></select>
     </label>
@@ -33,48 +62,44 @@
         <option value="30">近 30 天</option>
       </select>
     </label>
-    <button id="refresh" class="ghost">刷新</button>
-    <button id="csv" class="ghost">导出 CSV</button>
-    <button id="newCode" class="primary" style="padding:8px 16px">生成班级码</button>
-  </div>
+    <span class="t-scope" id="note">—</span>
+  </section>
 
   <div class="grid">
     <div class="card"><div class="k">求助总次数</div><div class="v" id="mTotal">—</div></div>
-    <div class="card"><div class="k">1 档自行解决</div><div class="v" id="mD1">—</div></div>
-    <div class="card"><div class="k">2 档点拨后解决</div><div class="v" id="mD2">—</div></div>
-    <div class="card"><div class="k">3 档完整讲解</div><div class="v" id="mD3">—</div></div>
+    <div class="card"><div class="k">1 档 自行解决</div><div class="v" id="mD1">—</div></div>
+    <div class="card"><div class="k">2 档 点拨后解决</div><div class="v" id="mD2">—</div></div>
+    <div class="card"><div class="k">3 档 完整讲解</div><div class="v" id="mD3">—</div></div>
   </div>
 
-  <div class="section">
-    <h3>数据口径</h3>
-    <p id="note" style="font-size:12.5px;color:#5b554e;margin:0"></p>
+  <div class="t-panels">
+    <section class="section">
+      <h3>本周卡得最多的三处 <span>TOP 3</span></h3>
+      <div id="bars" class="bars"></div>
+    </section>
+    <section class="section">
+      <h3>各门课分别问了多少</h3>
+      <div id="courses" class="bars"></div>
+    </section>
   </div>
 
-  <div class="section">
-    <h3>本周高频卡点 TOP3</h3>
-    <div id="bars" class="bars"></div>
-  </div>
-
-  <div class="section">
-    <h3>近 7 天求助趋势</h3>
+  <section class="section">
+    <h3>每天问了多少次 <span>近 7 天</span></h3>
     <div id="trend" class="trend"></div>
-  </div>
+  </section>
 
-  <div class="section">
-    <h3>课程分布</h3>
-    <div id="courses" class="bars"></div>
-  </div>
+  <section class="section t-advice">
+    <h3>下周可以这样讲</h3>
+    <p class="advice" id="advice">—</p>
+  </section>
 
-  <div class="section">
-    <h3>一条教学建议</h3>
-    <p class="advice" id="advice"></p>
-  </div>
-
-  <div class="section">
+  <section class="section t-code">
     <h3>班级码</h3>
-    <p style="font-size:12.5px;color:#5b554e;margin:0 0 10px">把下面这串码告诉学生，他们填在首页「班级码」里，你就能按班查看数据。班级码本身不含任何个人信息。</p>
+    <p class="note">把下面这串码告诉学生，他们填在首页「班级码」里，你就能按班查看。这串码里没有任何个人信息。</p>
     <span class="code-badge" id="codeBadge">------</span>
-  </div>
+  </section>
+
+  <p class="t-foot">数据只到班级和课程，不落到个人 · 匿名记录保留 7 天</p>
 </div>
 
 <script>
@@ -92,7 +117,7 @@ function el(tag, cls, text) {
 async function get(path) {
   const r = await fetch(path, { headers: { 'x-access-code': code } });
   if (r.status === 401) {
-    const v = prompt('请输入访问码');
+    const v = prompt('请输入访问码（演示码 demo）');
     if (v) { localStorage.setItem('askable.code', v); location.reload(); }
     return null;
   }

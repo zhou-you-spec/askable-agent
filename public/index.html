@@ -6,7 +6,10 @@
 <title>问不出口的那道题 · 实训答疑助教</title>
 <link rel="stylesheet" href="/styles.css" />
 </head>
-<body>
+<body class="theme-neo">
+<div class="fx" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
 <div class="app">
   <header class="top">
     <div class="brand">
@@ -14,9 +17,15 @@
       <div>
         <h1>问不出口的那道题</h1>
         <p class="sub">一个不会嘲笑你的实训答疑助教 · 档位永远由你拨</p>
+        <div class="badges">
+          <span class="bg-item live"><i></i>助教在线</span>
+          <span class="bg-item">本机就能跑</span>
+          <span class="bg-item">3 门课</span>
+        </div>
       </div>
     </div>
     <div class="top-actions">
+      <button id="themeBtn" class="ghost" type="button" title="切换深浅色">浅色</button>
       <button id="recordBtn" class="ghost" type="button">我的记录</button>
       <button id="helpBtn" class="ghost" type="button">怎么用</button>
       <button id="reportBtn" class="ghost" type="button">教师周报</button>
@@ -24,35 +33,58 @@
   </header>
 
   <section class="panel">
-    <div class="row">
-      <span class="label">课程</span>
-      <select id="courseSel" class="select" title="换课程只换知识库，机制不变"></select>
-      <span class="label mini-label">班级码</span>
-      <input id="classInput" class="mini" placeholder="可选，老师给" maxlength="16" />
-      <a class="ghost small" href="/teacher.html" target="_blank" rel="noopener">教师看板 →</a>
-    </div>
-    <div class="row">
-      <span class="label">求助深度</span>
-      <div class="seg" id="depthSeg">
-        <button data-depth="1" class="on" title="只给思路，不给代码">1 档 · 只给思路</button>
-        <button data-depth="2" title="只点出关键的一行">2 档 · 关键一行</button>
-        <button data-depth="3" title="完整代码 + 逐行讲解">3 档 · 完整代码</button>
+    <span class="hud tl"></span><span class="hud tr"></span>
+    <span class="hud bl"></span><span class="hud br"></span>
+    <div class="panel-main">
+      <div class="row">
+        <span class="label">课程</span>
+        <select id="courseSel" class="select" title="换课程只换知识库，机制不变"></select>
+        <span class="label mini-label">班级码</span>
+        <input id="classInput" class="mini" placeholder="可选，老师给" maxlength="16" />
+        <a class="ghost small" href="/teacher.html" target="_blank" rel="noopener">教师看板 →</a>
+      </div>
+      <div class="row">
+        <span class="label">求助深度</span>
+        <div class="seg" id="depthSeg">
+          <button data-depth="1" class="on" title="只给思路，不给代码">1 档 · 只给思路</button>
+          <button data-depth="2" title="只点出关键的一行">2 档 · 关键一行</button>
+          <button data-depth="3" title="完整代码 + 逐行讲解">3 档 · 完整代码</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="label">讲解粒度</span>
+        <div class="seg" id="grainSeg">
+          <button data-grain="line" title="每一行都讲">逐行讲</button>
+          <button data-grain="card" class="on" title="只讲卡住的那几步">只讲卡住的</button>
+          <button data-grain="code" title="只贴代码，不讲解">只给代码</button>
+        </div>
+      </div>
+      <div class="chips">
+        <span class="chip" id="chipDepth">当前档位：1 档 · 只给思路</span>
+        <span class="chip" id="chipSkip">本次跳过：无</span>
+        <span class="chip" id="chipMute">长期跳过：无</span>
+        <span class="chip" id="chipLearned">已掌握：无</span>
       </div>
     </div>
-    <div class="row">
-      <span class="label">讲解粒度</span>
-      <div class="seg" id="grainSeg">
-        <button data-grain="line" title="每一行都讲">逐行讲</button>
-        <button data-grain="card" class="on" title="只讲卡住的那几步">只讲卡住的</button>
-        <button data-grain="code" title="只贴代码，不讲解">只给代码</button>
+    <aside class="panel-deck" aria-hidden="true">
+      <div class="deck-title">它是怎么想的 <span>实时</span></div>
+      <div class="pipe" id="pipe">
+        <span class="node"><i>01</i><b>你说的话</b></span>
+        <span class="link"></span>
+        <span class="node"><i>02</i><b>听懂了</b><em id="pipeIntent">—</em></span>
+        <span class="link"></span>
+        <span class="node"><i>03</i><b>翻课程资料</b><em id="pipeKb">120</em></span>
+        <span class="link"></span>
+        <span class="node"><i>04</i><b>决定讲多深</b><em id="pipeDepth">1 档</em></span>
+        <span class="link"></span>
+        <span class="node"><i>05</i><b>开口讲</b></span>
       </div>
-    </div>
-    <div class="chips">
-      <span class="chip" id="chipDepth">当前档位：1 档 · 只给思路</span>
-      <span class="chip" id="chipSkip">本次跳过：无</span>
-      <span class="chip" id="chipMute">长期跳过：无</span>
-      <span class="chip" id="chipLearned">已掌握：无</span>
-    </div>
+      <div class="telemetry" id="telemetry">
+        <span class="tm on"><i></i><b id="tmMode">规则引擎</b></span>
+        <span class="tm">资料 <b id="tmKb">120</b> 条</span>
+        <span class="tm">回答 <b id="tmLt">--</b> 毫秒</span>
+      </div>
+    </aside>
   </section>
 
   <main class="chat" id="chat" aria-live="polite"></main>
@@ -66,6 +98,87 @@
   </footer>
   <p class="privacy">不收取姓名、学号、手机号 · 只有随机会话号 · 日志只留问题摘要</p>
 </div>
+
+<!-- 浮动挂件：遥测坞 -->
+<div class="widgets" aria-hidden="true">
+  <div class="wg wg-kb">
+    <div class="ring-wrap">
+      <div class="ring" id="wgRing"><span id="wgKbNum">120</span></div>
+    </div>
+    <div class="wg-legend">
+      <span><i class="d1"></i>报错</span>
+      <span><i class="d2"></i>概念</span>
+      <span><i class="d3"></i>类比</span>
+      <span><i class="d4"></i>教案</span>
+    </div>
+  </div>
+
+  <div class="wg wg-metric" id="wgLat">
+    <div class="wg-row">
+      <span class="wg-k">回答用时</span>
+      <b id="wgLatNum">--</b><span class="wg-u">毫秒</span>
+      <i class="dot ok" id="wgDot"></i>
+    </div>
+    <div class="wg-bar"><i id="wgLatBar"></i></div>
+    <svg class="spark" viewBox="0 0 88 24" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="sparkGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="var(--acc1)" />
+          <stop offset="100%" stop-color="var(--acc2)" />
+        </linearGradient>
+        <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--acc1)" stop-opacity=".35" />
+          <stop offset="100%" stop-color="var(--acc2)" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path id="wgSparkArea" fill="url(#sparkFill)" d="" />
+      <polyline id="wgSpark" points="" fill="none" stroke="url(#sparkGrad)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />
+      <circle id="wgSparkDot" r="2.2" fill="var(--acc2)" />
+    </svg>
+  </div>
+
+  <div class="wg wg-session">
+    <div class="wg-k">这次会话</div>
+    <div class="wg-sess">
+      <b id="wgSess">------</b>
+      <span class="wg-sep">·</span>
+      <span>聊了 <b id="wgTurns">0</b> 轮</span>
+      <span class="wg-sep">·</span>
+      <span>弄懂 <b id="wgLearned">0</b> 处</span>
+    </div>
+  </div>
+</div>
+
+<aside class="hud-side" id="hudSide" aria-hidden="true">
+  <div class="hs-block">
+    <span class="hs-k">运行方式</span>
+    <span class="hs-v" id="hudEngine">规则</span>
+  </div>
+  <div class="hs-line"></div>
+  <div class="hs-block">
+    <span class="hs-k">这次会话</span>
+    <span class="hs-v" id="hudSession">------</span>
+  </div>
+  <div class="hs-line"></div>
+  <div class="hs-block">
+    <span class="hs-k">正在上的课</span>
+    <span class="hs-v" id="hudCourse">—</span>
+  </div>
+  <div class="hs-line"></div>
+  <div class="hs-block">
+    <span class="hs-k">课程资料</span>
+    <span class="hs-v" id="hudKb">120</span>
+  </div>
+  <div class="hs-line"></div>
+  <div class="hs-block">
+    <span class="hs-k">现在的讲法</span>
+    <span class="hs-v" id="hudDepth">1 档</span>
+  </div>
+  <div class="hs-line"></div>
+  <div class="hs-block hs-live">
+    <i></i><span class="hs-k">在线</span>
+  </div>
+</aside>
 
 <!-- 首次使用引导 -->
 <div class="modal" id="onboard" hidden>

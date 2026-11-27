@@ -34,6 +34,7 @@ function finishTyping() {
   if (!typing) return;
   clearTimeout(typing.timer);
   typing.el.textContent = typing.text;
+  if (typing.msgEl) typing.msgEl.classList.remove('streaming');
   const done = typing.done;
   typing = null;
   if (done) done();
@@ -42,21 +43,40 @@ function finishTyping() {
 
 function typeOut(node, text, done) {
   let i = 0;
-  const step = Math.max(1, Math.round(text.length / 80));
-  typing = { el: node, text, done, timer: null };
+  const total = text.length;
+  const step = Math.max(1, Math.round(total / 110)); // 约 1.5 秒打完，长文自动加速
+  const msgEl = node.closest('.msg');
+  if (msgEl) msgEl.classList.add('streaming');
+  typing = { el: node, text, done, timer: null, msgEl };
   const tick = () => {
     if (!typing || typing.el !== node) return;
-    i = Math.min(text.length, i + step);
+    i = Math.min(total, i + step);
     node.textContent = text.slice(0, i);
     scrollDown();
-    if (i < text.length) typing.timer = setTimeout(tick, 16);
+    if (i < total) typing.timer = setTimeout(tick, 14);
     else {
+      if (msgEl) msgEl.classList.remove('streaming');
       typing = null;
       if (done) done();
       scrollDown();
     }
   };
   tick();
+}
+
+/* ---------- 侧边 HUD ---------- */
+function paintHud(state) {
+  if (!state) return;
+  const code = String(state.sid || sid || '').replace(/^s_/, '').slice(0, 6) || '------';
+  const map = {
+    '#hudSession': code,
+    '#hudCourse': (state.courseName || '—').split(' ')[0],
+    '#hudDepth': state.depth + ' 档'
+  };
+  for (const [sel, val] of Object.entries(map)) {
+    const el = document.querySelector(sel);
+    if (el) el.textContent = val;
+  }
 }
 
 chat.addEventListener('click', () => {
@@ -72,8 +92,8 @@ function pushUser(text) {
 function showThinking() {
   hideThinking();
   thinkingEl = el('div', 'msg bot thinking');
-  const d = el('div', 'body dots');
-  d.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+  const d = el('div', 'body think');
+  d.innerHTML = '<span class="spinner"></span><span class="think-label">我在看你的问题…</span>';
   thinkingEl.appendChild(d);
   chat.appendChild(thinkingEl);
   scrollDown();
@@ -86,9 +106,10 @@ function hideThinking() {
   }
 }
 
-function pushBot(res) {
+function pushBot(res, ms) {
   hideThinking();
   finishTyping();
+  flowPipeline(res.kind);
   const wrap = el('div', 'msg bot');
   const body = el('div', 'body');
   wrap.appendChild(body);
@@ -115,6 +136,11 @@ function pushBot(res) {
     if (res.sources && res.sources.length) {
       wrap.appendChild(el('div', 'sources', '来源：' + res.sources.join(' · ')));
     }
+    const metaBits = [];
+    if (res.state && res.state.courseName) metaBits.push('用了《' + res.state.courseName + '》的资料');
+    if (res.state && res.state.depthName) metaBits.push(res.state.depthName);
+    if (typeof ms === 'number') metaBits.push('回答用了 ' + ms + ' 毫秒');
+    if (metaBits.length) wrap.appendChild(el('div', 'meta', metaBits.join('  ·  ')));
     if (res.suggestions && res.suggestions.length) {
       const s = el('div', 'suggest');
       for (const q of res.suggestions) {
@@ -140,6 +166,9 @@ function pushSys(text) {
 function paintState(state) {
   lastState = state;
   if (!$('#recordModal').hidden) renderRecord();
+  paintPipeline(state);
+  paintHud(state);
+  paintSessionWidget(state);
   $('#chipDepth').textContent = '当前档位：' + state.depthName;
   $('#chipSkip').textContent = '本次跳过：' + (state.skippedLines.length ? state.skippedLines.map((n) => n + ' 行').join('、') : '无');
   $('#chipMute').textContent = '长期跳过：' + (state.muted.length ? state.muted.join('、') : '无');
@@ -180,6 +209,7 @@ async function loadCourses() {
       sid = r.sid;
       localStorage.setItem('askable.sid', sid);
       paintState(r.state);
+      paintKbWidget(courseId);
       pushSys('已切到「' + r.state.courseName + '」——机制不动，只换了知识库；档位重置为 1 档。');
     } catch (e) {
       /* 访问码分支已在 api() 处理 */
@@ -191,7 +221,189 @@ async function loadCourses() {
     localStorage.setItem('askable.class', classCode);
     pushSys(classCode ? '班级码已记录：' + classCode + '（只用于班级维度汇总，不关联个人）' : '已清除班级码。');
   };
+  paintTelemetry(data.courses);
+  courseList = data.courses;
+  paintKbWidget(courseId);
   return data;
+}
+
+/* ---------- 推理管线装饰 ---------- */
+
+function paintTelemetry(courses) {
+  const kb = $('#tmKb');
+  if (kb && courses) {
+    const total = courses.reduce(
+      (sum, c) => sum + c.counts.errors + c.counts.concepts + c.counts.analogies + c.counts.lessons,
+      0
+    );
+    kb.textContent = String(total);
+    const hk = $('#hudKb');
+    if (hk) hk.textContent = String(total);
+    const pk = document.getElementById('pipeKb');
+    if (pk) pk.textContent = String(total);
+  }
+}
+
+async function paintMode() {
+  try {
+    const r = await fetch('/api/health', { headers: { 'x-access-code': accessCode } });
+    if (!r.ok) return;
+    const j = await r.json();
+    const el = $('#tmMode');
+    if (el) el.textContent = j.llm ? '大模型 + 规则' : '规则引擎';
+    const he = $('#hudEngine');
+    if (he) he.textContent = j.llm ? '大模型' : '规则';
+  } catch (e) {
+    /* 忽略 */
+  }
+}
+
+/* ---------- 浮动挂件 ---------- */
+let courseList = [];
+
+function paintKbWidget(courseId) {
+  const ring = document.getElementById('wgRing');
+  const num = document.getElementById('wgKbNum');
+  if (!ring || !num || !courseList.length) return;
+  const c = courseList.find((x) => x.id === courseId) || courseList[0];
+  if (!c) return;
+  const segs = [
+    [c.counts.errors, '#ff8a4c'],
+    [c.counts.concepts, '#ff5c7a'],
+    [c.counts.analogies, '#2f9e9e'],
+    [c.counts.lessons, '#7c9cff']
+  ];
+  const total = segs.reduce((s, x) => s + x[0], 0) || 1;
+  let acc = 0;
+  const parts = segs.map(([n, color]) => {
+    const from = (acc / total) * 100;
+    acc += n;
+    const to = (acc / total) * 100;
+    return `${color} ${from.toFixed(2)}% ${to.toFixed(2)}%`;
+  });
+  ring.style.background = `conic-gradient(${parts.join(',')})`;
+  // 数字滚动
+  const prev = Number(num.textContent) || 0;
+  if (prev !== total) {
+    const t0 = performance.now();
+    const step = () => {
+      const k = Math.min(1, (performance.now() - t0) / 520);
+      num.textContent = String(Math.round(prev + (total - prev) * k));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  } else {
+    num.textContent = String(total);
+  }
+}
+
+const latHistory = [];
+
+function paintLatencyWidget(ms) {
+  const b = document.getElementById('wgLatNum');
+  const d = document.getElementById('wgDot');
+  if (b) b.textContent = String(ms);
+  if (d) d.className = 'dot ' + (ms < 40 ? 'ok' : ms < 120 ? 'mid' : 'slow');
+
+  // 数值变化时轻微跳一下
+  const box = document.getElementById('wgLat');
+  if (box) {
+    box.classList.remove('bump');
+    void box.offsetWidth;
+    box.classList.add('bump');
+  }
+
+  // 延迟条：0–200ms 映射到 0–100%
+  const bar = document.getElementById('wgLatBar');
+  if (bar) {
+    const pct = Math.max(4, Math.min(100, (ms / 200) * 100));
+    bar.style.width = pct.toFixed(0) + '%';
+    bar.style.background = ms < 40
+      ? 'linear-gradient(90deg,#34c77b,#22c7e8)'
+      : ms < 120
+        ? 'linear-gradient(90deg,#f5b942,#ff9a5c)'
+        : 'linear-gradient(90deg,#ff5c5c,#ff8a4c)';
+  }
+
+  // 最近 12 次响应的小折线 + 面积 + 末端光点
+  latHistory.push(ms);
+  if (latHistory.length > 12) latHistory.shift();
+  const poly = document.getElementById('wgSpark');
+  const area = document.getElementById('wgSparkArea');
+  const dotEl = document.getElementById('wgSparkDot');
+  if (poly && latHistory.length) {
+    const max = Math.max(...latHistory, 1);
+    const n = latHistory.length;
+    const pts = latHistory.map((v, i) => {
+      const x = n === 1 ? 88 : (i / (n - 1)) * 88;
+      const y = 22 - (v / max) * 16 - 2;
+      return { x: +x.toFixed(1), y: +y.toFixed(1) };
+    });
+    poly.setAttribute('points', pts.map((p) => p.x + ',' + p.y).join(' '));
+    if (area) {
+      area.setAttribute('d', 'M0,24 L' + pts.map((p) => p.x + ',' + p.y).join(' L') + ' L88,24 Z');
+    }
+    if (dotEl) {
+      const last = pts[pts.length - 1];
+      dotEl.setAttribute('cx', String(last.x));
+      dotEl.setAttribute('cy', String(last.y));
+    }
+  }
+}
+
+/* ---------- 会话记忆卡 ---------- */
+function paintSessionWidget(state) {
+  if (!state) return;
+  const codeEl = document.getElementById('wgSess');
+  const turnsEl = document.getElementById('wgTurns');
+  const learnedEl = document.getElementById('wgLearned');
+  if (codeEl) codeEl.textContent = String(state.sid || sid || '').replace(/^s_/, '').slice(0, 6) || '------';
+  if (turnsEl) turnsEl.textContent = String(state.turns || 0);
+  if (learnedEl) learnedEl.textContent = String((state.learned || []).length);
+}
+
+/* ---------- 推理管线 ---------- */
+const INTENT_LABEL = {
+  error: '报错了',
+  concept: '在问概念',
+  refuse: '想让我代写',
+  crisis: '情绪很重',
+  injection: '想套规则',
+  impersonate: '说自己是老师',
+  offtopic: '跑题了',
+  fallback: '资料里没有',
+  retell: '还想再听一遍',
+  full: '要完整讲',
+  guide: '在跟着想',
+  learned: '说懂了',
+  forgot: '学过但忘了',
+  mute: '让我别讲',
+  skip: '跳过这行',
+  shy: '不敢问',
+  empty: '没说话',
+  upgrade: '想再深一点',
+  'no-code': '资料里没有'
+};
+
+let pipeTimer = null;
+
+function paintPipeline(state) {
+  const d = document.getElementById('pipeDepth');
+  if (d && state) {
+    d.textContent = state.depth + ' 档 · ' + ({ line: '逐行讲', card: '只讲卡住', code: '只给代码' }[state.grain] || '');
+  }
+}
+
+function flowPipeline(kind) {
+  const intent = document.getElementById('pipeIntent');
+  if (intent) intent.textContent = INTENT_LABEL[kind] || '—';
+  const pipe = document.getElementById('pipe');
+  if (!pipe) return;
+  pipe.classList.remove('flow');
+  void pipe.offsetWidth;
+  pipe.classList.add('flow');
+  clearTimeout(pipeTimer);
+  pipeTimer = setTimeout(() => pipe.classList.remove('flow'), 1200);
 }
 
 async function api(path, body) {
@@ -214,20 +426,30 @@ async function ask(text) {
   if (!message || busy) return;
   busy = true;
   sendBtn.disabled = true;
+  sendBtn.classList.add('busy');
   finishTyping();
   pushUser(message);
   input.value = '';
   input.style.height = 'auto';
+  showThinking();
+  const t0 = performance.now();
   try {
     const res = await api('/api/chat', { sid, message });
+    const ms = Math.round(performance.now() - t0);
     sid = res.sid;
     localStorage.setItem('askable.sid', sid);
-    pushBot(res);
+    pushBot(res, ms);
+    const lt = $('#tmLt');
+    if (lt) lt.textContent = String(ms);
+    paintLatencyWidget(ms);
   } catch (e) {
+    hideThinking();
     if (e.message !== '需要访问码') pushSys('网络走神了，再发一次试试。（' + e.message + '）');
   } finally {
+    hideThinking();
     busy = false;
     sendBtn.disabled = false;
+    sendBtn.classList.remove('busy');
     input.focus();
   }
 }
@@ -426,6 +648,32 @@ $('#helpBtn').onclick = openOnboard;
   };
 })();
 
+/* ---------- 主题：科技蓝（浅色）/ 深夜（深色）两套 ---------- */
+const THEME_KEY = 'askable.theme';
+const THEMES = ['neo', 'aurora'];
+const THEME_LABEL = { neo: '科技蓝', aurora: '深夜' };
+
+function applyTheme(name) {
+  const t = THEMES.includes(name) ? name : 'neo';
+  document.body.classList.remove('theme-neo', 'theme-sunlit', 'theme-aurora');
+  document.body.classList.add('theme-' + t);
+  const btn = $('#themeBtn');
+  if (btn) btn.textContent = THEME_LABEL[t];
+  return t;
+}
+
+(function initTheme() {
+  let t = applyTheme(localStorage.getItem(THEME_KEY) || 'neo');
+  const btn = $('#themeBtn');
+  if (btn) {
+    btn.title = '点击切换：科技蓝 ↔ 深夜';
+    btn.onclick = () => {
+      t = applyTheme(THEMES[(THEMES.indexOf(t) + 1) % THEMES.length]);
+      localStorage.setItem(THEME_KEY, t);
+    };
+  }
+})();
+
 /* ---------- 我的记录 ---------- */
 function renderRecord() {
   const s = lastState || { learned: [], stuck: [] };
@@ -456,6 +704,7 @@ async function boot() {
   try {
     const data = await loadCourses();
     if (!data) return;
+    paintMode();
     const r = await api('/api/session', { sid });
     sid = r.sid;
     localStorage.setItem('askable.sid', sid);
